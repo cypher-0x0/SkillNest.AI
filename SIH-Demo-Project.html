@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillNest.AI - Personalized Career & Education Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <style>
+        /* Main Page Styles */
+        body {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        header {
+            background-color: rgba(31, 41, 55, 0.8);
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #ef4444, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .skill-gap-bar {
+            transition: width 1s ease-in-out;
+        }
+        .dashboard-card {
+            transition: all 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .message-bubble {
+            max-width: 75%;
+        }
+
+        /* Scoped Aptitude Test Styles */
+        #aptitude-test-page {
+            font-family: 'Inter', sans-serif';
+            background: #111827;
+            color: #d1d5db;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        #aptitude-test-page .aptitude-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #1f2937;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        #aptitude-test-page header {
+            background: linear-gradient(90deg, #ef4444, #4f46e5);
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #aptitude-test-page header h1 {
+            font-size: 2em;
+            font-weight: 800;
+        }
+        #aptitude-test-page #back-to-main-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #aptitude-test-page #back-to-main-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        #aptitude-test-page #quiz-container, #aptitude-test-page #result-container {
+            padding: 40px;
+        }
+        #aptitude-test-page #progress-bar {
+            width: 100%;
+            background-color: #374151;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        #aptitude-test-page #progress-bar-inner {
+            height: 15px;
+            width: 0%;
+            background-color: #4f46e5;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        #aptitude-test-page #question-text {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #e5e7eb;
+        }
+        #aptitude-test-page .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        #aptitude-test-page .option {
+            background: #374151;
+            border: 2px solid #4b5563;
+            color: #d1d5db;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.1em;
+        }
+        #aptitude-test-page .option:hover {
+            border-color: #4f46e5;
+            background: #4a3480;
+            color: white;
+        }
+        #aptitude-test-page .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        #aptitude-test-page .nav-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        #aptitude-test-page .nav-btn:hover {
+            background: #4338ca;
+        }
+        #aptitude-test-page .nav-btn:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+        }
+        #aptitude-test-page #result-container h2 {
+            font-size: 2.5em;
+            color: #4f46e5;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #aptitude-test-page #result-summary {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        #aptitude-test-page .result-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            background: #1f2937;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        #aptitude-test-page .result-details h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #ef4444;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 10px;
+        }
+        #aptitude-test-page #result-actions {
+            text-align: center;
+            margin-top: 40px;
+        }
+        #aptitude-test-page #result-actions button {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-['Inter',_sans-serif']">
+
+    <main id="main-content">
+        <header class="bg-gray-900/80 backdrop-blur-lg fixed top-0 left-0 right-0 z-50 shadow-sm">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="#" class="text-3xl font-bold text-gray-100 transition duration-300 hover:text-indigo-400">SkillNest.AI</a>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="#dashboard" class="text-gray-400 hover:text-indigo-400">Dashboard</a>
+                    <a href="#features" class="text-gray-400 hover:text-indigo-400">Features</a>
+                    <a href="#chatbot" class="text-gray-400 hover:text-indigo-400">Advisor Chat</a>
+                    <a href="#job-analyzer" class="text-gray-400 hover:text-indigo-400">Job Analyzer</a>
+                    <button id="login-btn" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">Login</button>
+                </nav>
+                <button class="md:hidden text-gray-400">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <section class="pt-24 md:pt-32 pb-16 bg-gray-950">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-4">Unlock Your <span class="gradient-text">Future Potential</span></h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8">SkillNest.AI is your personalized AI-powered career and education advisor. Discover your strengths, bridge skill gaps, and find the perfect path to success.</p>
+                <button id="take-aptitude-test-btn" class="bg-indigo-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl">Take Aptitude Test</button>
+            </div>
+        </section>
+
+        <section id="dashboard" class="py-16 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-100">Your Personalized Dashboard</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="dashboard-card bg-gray-800 p-6 rounded-xl shadow-md">
+                        <h3 class="font-bold text-xl mb-3 text-indigo-400">Recommended Career Path</h3>
+                        <p class="text-2xl font-semibold mb-2">Data Scientist</p>
+                        <p class="text-gray-400">Based on your skills and interests, this role is a 92% match.</p>
+                    </div>
+                    <div class="dashboard-card bg-gray-800 p-6 rounded-xl shadow-md">
+                        <h3 class="font-bold text-xl mb-3 text-red-400">Skill Gap Analysis</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-300">Python</span>
+                                    <span class="text-sm font-medium text-gray-300">85%</span>
+                                </div>
+                                <div class="w-full bg-gray-600 rounded-full h-2.5">
+                                    <div class="bg-indigo-600 h-2.5 rounded-full skill-gap-bar" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-300">Machine Learning</span>
+                                    <span class="text-sm font-medium text-gray-300">70%</span>
+                                </div>
+                                <div class="w-full bg-gray-600 rounded-full h-2.5">
+                                    <div class="bg-red-500 h-2.5 rounded-full skill-gap-bar" style="width: 70%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card bg-gray-800 p-6 rounded-xl shadow-md">
+                        <h3 class="font-bold text-xl mb-3 text-indigo-400">Next Step</h3>
+                        <p class="text-lg font-semibold mb-2">Advanced Python Course</p>
+                        <p class="text-gray-400">Enroll in this course to boost your Python skills by a projected 10%.</p>
+                        <a href="#" class="text-indigo-400 font-semibold mt-3 inline-block">View Course <i class="fas fa-arrow-right ml-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-16 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-100">How SkillNest.AI Helps You</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <div class="p-6">
+                        <i class="fas fa-diagnoses text-4xl text-red-500 mb-4"></i>
+                        <h3 class="font-bold text-xl mb-2 text-gray-100">Aptitude Testing</h3>
+                        <p class="text-gray-400">Discover your natural talents and strengths with our comprehensive test.</p>
+                    </div>
+                    <div class="p-6">
+                        <i class="fas fa-chart-line text-4xl text-indigo-600 mb-4"></i>
+                        <h3 class="font-bold text-xl mb-2 text-gray-100">Personalized Paths</h3>
+                        <p class="text-gray-400">Get a customized roadmap with courses and steps to reach your career goals.</p>
+                    </div>
+                    <div class="p-6">
+                        <i class="fas fa-lightbulb text-4xl text-red-500 mb-4"></i>
+                        <h3 class="font-bold text-xl mb-2 text-gray-100">AI-Powered Advice</h3>
+                        <p class="text-gray-400">Chat with our AI advisor to get instant answers and guidance.</p>
+                    </div>
+                    <div class="p-6">
+                        <i class="fas fa-tasks text-4xl text-indigo-600 mb-4"></i>
+                        <h3 class="font-bold text-xl mb-2 text-gray-100">Progress Tracking</h3>
+                        <p class="text-gray-400">Monitor your skill development and celebrate milestones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="job-analyzer" class="py-16 bg-gray-950">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-100">Job Description Analyzer <i class="fas fa-search-plus text-2xl ml-2 text-red-400"></i></h2>
+                <div class="max-w-3xl mx-auto bg-gray-800 rounded-xl shadow-lg p-8">
+                    <p class="text-gray-400 mb-4">Paste a job description below to get a list of key skills and competencies required for the role.</p>
+                    <textarea id="job-description-input" class="w-full h-48 p-4 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-700 text-gray-100" placeholder="Paste your job description here..."></textarea>
+                    <div class="flex justify-end mt-4">
+                        <button id="analyze-job-btn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">Analyze Job Description</button>
+                    </div>
+                    <div id="job-analysis-results" class="mt-8">
+                        <p class="text-gray-400">Analysis results will appear here...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="chatbot" class="py-16 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-100">Chat with Your AI Advisor</h2>
+                <div class="max-w-3xl mx-auto bg-gray-800 rounded-xl shadow-lg flex flex-col" style="height: 60vh;">
+                    <div id="chat-messages" class="flex-1 p-6 overflow-y-auto">
+                        <div class="flex justify-start mb-4">
+                            <p class="bg-gray-700 text-gray-100 p-3 rounded-lg message-bubble">
+                                Hello! I'm your AI career advisor. How can I help you plan your future today?
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t border-gray-700">
+                        <form id="chat-form" class="flex space-x-3">
+                            <input id="chat-input" type="text" placeholder="Ask about careers, skills, or courses..." class="flex-1 p-3 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-700 text-gray-100">
+                            <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-800 text-white py-8">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 SkillNest.AI. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </main>
+    
+    <section id="aptitude-test-page" class="hidden">
+        <div class="aptitude-container">
+            <header>
+                <h1>Aptitude Test</h1>
+                <button id="back-to-main-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+            </header>
+            <div id="quiz-container">
+                <div id="progress-bar">
+                    <div id="progress-bar-inner"></div>
+                </div>
+                <p id="progress-text" class="text-center font-semibold mb-4"></p>
+                <div id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <div class="navigation">
+                    <button id="prev-btn" class="nav-btn" onclick="prevQuestion()">Previous</button>
+                    <button id="next-btn" class="nav-btn" onclick="nextQuestion()">Next</button>
+                </div>
+            </div>
+            <div id="result-container" style="display: none;">
+                <h2>Your Aptitude Profile</h2>
+                <p id="result-summary">Based on your answers, here is your recommended career path.</p>
+                <div class="result-details">
+                    <div>
+                        <h3 id="career-title"></h3>
+                        <p id="career-description"></p>
+                    </div>
+                    <div>
+                        <h3>Your Roadmap to Success</h3>
+                        <div id="path-details"></div>
+                    </div>
+                </div>
+                <div id="result-actions">
+                    <button class="nav-btn" onclick="restartTest()">Restart Test</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity"></div>
+    <div id="login-modal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800 rounded-lg shadow-xl p-8 z-50 w-full max-w-md border border-gray-700">
+        <button id="close-login-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100">&times;</button>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-100">Login to SkillNest.AI</h2>
+        <form>
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
+                <input type="email" id="email" class="w-full px-3 py-2 border border-gray-700 rounded-md focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-gray-100" placeholder="you@example.com">
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-400 mb-1">Password</label>
+                <input type="password" id="password" class="w-full px-3 py-2 border border-gray-700 rounded-md focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-gray-100" placeholder="••••••••">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md font-semibold hover:bg-indigo-700 transition">Login</button>
+        </form>
+    </div>
+
+    <script>
+        const app_id = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebase_config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initial_auth_token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+
+        // --- VIEW SWITCHING LOGIC ---
+        const mainContent = document.getElementById('main-content');
+        const aptitudeTestPage = document.getElementById('aptitude-test-page');
+        const takeAptitudeTestBtn = document.getElementById('take-aptitude-test-btn');
+        const backToMainBtn = document.getElementById('back-to-main-btn');
+
+        takeAptitudeTestBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            mainContent.classList.add('hidden');
+            aptitudeTestPage.classList.remove('hidden');
+            window.scrollTo(0, 0);
+            initializeQuiz();
+        });
+
+        backToMainBtn.addEventListener('click', () => {
+            aptitudeTestPage.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        });
+
+
+        // --- MAIN PAGE SCRIPT ---
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const jobDescriptionInput = document.getElementById('job-description-input');
+        const analyzeJobBtn = document.getElementById('analyze-job-btn');
+        const jobAnalysisResults = document.getElementById('job-analysis-results');
+
+        // Placeholder for chat history
+        const chatHistory = [{
+            role: "user",
+            parts: [{ text: "You are a professional career advisor. Help me understand career paths and required skills." }]
+        }];
+        const apiKey = "AIzaSyAm6Y_wo-qYTb6Fm8eVwArYncRVQgZXO8w";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        // Chatbot Integration
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            // Display user message
+            appendMessage(userMessage, 'user');
+            chatInput.value = '';
+
+            // Add user message to history
+            chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+
+            // Display loading indicator
+            const loadingMsg = appendMessage('...', 'bot');
+
+            try {
+                const payload = {
+                    contents: chatHistory,
+                };
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const botMessage = result.candidates[0].content.parts[0].text;
+                
+                // Remove loading indicator and replace with bot response
+                loadingMsg.remove();
+                appendMessage(botMessage, 'bot');
+
+                // Add bot message to history
+                chatHistory.push({ role: "model", parts: [{ text: botMessage }] });
+
+            } catch (error) {
+                console.error("Error fetching from API:", error);
+                loadingMsg.remove();
+                appendMessage("Sorry, I'm having trouble connecting right now. Please try again later.", 'bot');
+            }
+        });
+
+        // Job Description Analyzer
+        analyzeJobBtn.addEventListener('click', async () => {
+            const jobDescription = jobDescriptionInput.value.trim();
+            if (!jobDescription) {
+                jobAnalysisResults.innerHTML = '<p class="text-red-500">Please paste a job description to analyze.</p>';
+                return;
+            }
+
+            jobAnalysisResults.innerHTML = '<p class="text-gray-400">Analyzing...</p>';
+
+            const systemPrompt = "Extract and list the most important skills, responsibilities, and qualifications from the following job description. Format the output as a Markdown list.";
+            const userQuery = `Job Description:\n\n${jobDescription}`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                const analysisText = result.candidates[0].content.parts[0].text;
+                jobAnalysisResults.innerHTML = marked.parse(analysisText);
+            } catch (error) {
+                console.error("Error analyzing job description:", error);
+                jobAnalysisResults.innerHTML = '<p class="text-red-500">Failed to analyze the job description. Please try again.</p>';
+            }
+        });
+
+
+        function appendMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            const alignment = sender === 'user' ? 'justify-end' : 'justify-start';
+            messageDiv.className = `flex ${alignment} mb-4`;
+            messageDiv.innerHTML = `
+                <p class="${sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-100'} p-3 rounded-lg message-bubble">
+                    ${marked.parseInline(message)}
+                </p>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return messageDiv;
+        }
+
+        // Modal functionality
+        const loginBtn = document.getElementById('login-btn');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const loginModal = document.getElementById('login-modal');
+        const closeLoginModalBtn = document.getElementById('close-login-modal');
+
+        function openModal(modal) {
+            modalBackdrop.classList.remove('hidden');
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal(modal) {
+            modalBackdrop.classList.add('hidden');
+            modal.classList.add('hidden');
+        }
+
+        loginBtn.addEventListener('click', () => openModal(loginModal));
+        closeLoginModalBtn.addEventListener('click', () => closeModal(loginModal));
+        modalBackdrop.addEventListener('click', () => {
+            closeModal(loginModal);
+        });
+
+
+        // --- APTITUDE TEST SCRIPT ---
+        const questions = [
+            {
+                question: "When faced with a complex problem, what is your first instinct?",
+                options: [
+                    { text: "Analyze the data and identify logical patterns.", value: "analytical" },
+                    { text: "Think of novel, out-of-the-box solutions.", value: "creative" },
+                    { text: "Consider how the solution will affect people.", value: "helping" },
+                    { text: "Create a structured plan and delegate tasks.", value: "leadership" }
+                ]
+            },
+            {
+                question: "Which of these activities sounds most appealing for a weekend?",
+                options: [
+                    { text: "Building a complex Lego model or solving a Sudoku puzzle.", value: "analytical" },
+                    { text: "Visiting an art gallery or writing a short story.", value: "creative" },
+                    { text: "Volunteering at a local charity or helping a friend move.", value: "helping" },
+                    { text: "Organizing a group trip or a sports tournament.", value: "leadership" }
+                ]
+            },
+            {
+                question: "In a team project, you are most likely to be the one who:",
+                options: [
+                    { text: "Ensures the technical accuracy of the work.", value: "analytical" },
+                    { text: "Comes up with the initial concept and visual design.", value: "creative" },
+                    { text: "Makes sure everyone feels included and heard.", value: "helping" },
+                    { text: "Keeps the team on track and focused on the goal.", value: "leadership" }
+                ]
+            },
+            {
+                question: "What type of work environment do you thrive in?",
+                options: [
+                    { text: "A data-driven environment with clear, measurable goals.", value: "analytical" },
+                    { text: "A flexible and innovative space that encourages experimentation.", value: "creative" },
+                    { text: "A collaborative and supportive setting focused on a common good.", value: "helping" },
+                    { text: "A fast-paced, results-oriented environment where you can take charge.", value: "leadership" }
+                ]
+            },
+            {
+                question: "How do you prefer to learn new things?",
+                options: [
+                    { text: "Through structured courses, reading documentation, and analyzing examples.", value: "analytical" },
+                    { text: "By tinkering, exploring visually, and learning through trial-and-error.", value: "creative" },
+                    { text: "By discussing with others, mentoring, or through hands-on workshops.", value: "helping" },
+                    { text: "By taking on a challenge, leading a study group, and applying concepts directly.", value: "leadership" }
+                ]
+            },
+             {
+                question: "What do you value most in a career?",
+                options: [
+                    { text: "Solving challenging intellectual puzzles.", value: "analytical" },
+                    { text: "Having the freedom to express my ideas.", value: "creative" },
+                    { text: "Making a tangible, positive impact on others' lives.", value: "helping" },
+                    { text: "Having opportunities for growth and influence.", value: "leadership" }
+                ]
+            },
+            {
+                question: "When you receive feedback, you are most interested in:",
+                options: [
+                    { text: "The data and metrics that support the feedback.", value: "analytical" },
+                    { text: "How you can use it to think differently about your approach.", value: "creative" },
+                    { text: "How the feedback affects team harmony and relationships.", value: "helping" },
+                    { text: "Actionable steps you can take to improve performance.", value: "leadership" }
+                ]
+            },
+            {
+                question: "Which of these book genres are you most likely to pick up?",
+                options: [
+                    { text: "Science-fiction with detailed world-building or a complex mystery.", value: "analytical" },
+                    { text: "Fantasy, poetry, or a book on art history.", value: "creative" },
+                    { text: "A biography, a self-help book, or a heartwarming story.", value: "helping" },
+                    { text: "A book on business strategy, history, or leadership.", value: "leadership" }
+                ]
+            }
+        ];
+
+        const careerPaths = {
+            // Primary Profiles
+            analytical: {
+                title: "Data Scientist / Analyst",
+                description: "You excel at logical reasoning and data-driven decision making. A career in data science, analysis, or software engineering would be a great fit, allowing you to solve complex problems.",
+                path: [
+                    "Obtain a Bachelor's degree in Computer Science, Statistics, or a related field.",
+                    "Start in an Entry-Level role like Data Analyst or Junior Data Scientist.",
+                    "Advance to a Mid-Career position such as Senior Data Scientist or Machine Learning Engineer.",
+                    "Aim for a Senior-Level role like Lead Data Scientist or Chief Data Officer."
+                ]
+            },
+            creative: {
+                title: "Graphic Designer / Digital Artist",
+                description: "You have a talent for innovation and aesthetics. A career in design, marketing, or content creation would allow you to use your imagination and build beautiful, user-centric experiences.",
+                path: [
+                    "Earn a Bachelor's degree in Design, Fine Arts, or a related field.",
+                    "Build a strong portfolio showcasing your creative work.",
+                    "Begin your career as a Junior Designer or Production Artist.",
+                    "Aspire to become a Senior Designer, Art Director, or Creative Director."
+                ]
+            },
+            helping: {
+                title: "Healthcare Professional / Teacher",
+                description: "You are empathetic and driven by a desire to help others. A career in healthcare, education, or social work would be deeply fulfilling, allowing you to make a tangible impact on people's lives.",
+                path: [
+                    "Complete a Bachelor's in Biology, Nursing, Pre-Med, or Education.",
+                    "Attend Medical School, a Nursing Program, or a Teacher Certification program.",
+                    "Gain experience through Residency, Specialization, or Classroom Teaching.",
+                    "Become a Board Certified Physician, Senior Nurse, or a tenured Educator."
+                ]
+            },
+            leadership: {
+                title: "Project Manager / Entrepreneur",
+                description: "You are a natural leader, skilled at organization and motivating others. A career in management, consulting, or starting your own business would leverage your ability to see the big picture and guide teams to success.",
+                path: [
+                    "Get a Bachelor's degree in Business Administration or a related field.",
+                    "Enter the workforce as a Management Trainee or Junior Manager.",
+                    "Move up to become a Department Manager or Project Lead.",
+                    "Strive for a Senior Executive, Director, or CEO position."
+                ]
+            },
+            // Combination Profiles
+            analytical_leadership: {
+                title: "Engineering Manager / Financial Strategist",
+                description: "Your blend of analytical rigor and leadership skills makes you ideal for roles where data-driven decisions guide team strategy. You can both understand complex systems and lead people to build or manage them effectively.",
+                path: [
+                    "Obtain a technical degree (e.g., Engineering, Finance, CS).",
+                    "Gain experience as an individual contributor (e.g., Engineer, Analyst).",
+                    "Take on team lead responsibilities and pursue management training.",
+                    "Transition into a full-time Manager, Strategist, or Director role."
+                ]
+            },
+             creative_helping: {
+                title: "UX Researcher / Art Therapist",
+                description: "You combine creativity with a deep sense of empathy. This makes you perfect for roles where you need to understand human experiences and design solutions or therapies that are both innovative and genuinely helpful.",
+                path: [
+                    "Get a degree in Psychology, Design, HCI, or Social Work.",
+                    "Specialize with a Master's or certification in your chosen field.",
+                    "Start in a research assistant, junior designer, or associate therapist role.",
+                    "Grow into a Senior UX Researcher, a licensed Therapist, or a program lead."
+                ]
+            },
+            leadership_helping: {
+                title: "Non-Profit Director / HR Manager",
+                description: "You are driven to lead with a purpose that helps others. You excel at organizing teams around a mission, making you a great fit for managing organizations or departments focused on people and community welfare.",
+                 path: [
+                    "Obtain a degree in Public Administration, HR, or a related field.",
+                    "Gain experience in a non-profit, HR, or community-focused organization.",
+                    "Move into a coordinator or specialist role to learn operations.",
+                    "Advance to a position as a Manager, Director, or Head of HR."
+                ]
+            },
+            analytical_creative: {
+                title: "Product Designer / Architect",
+                description: "You have a unique ability to bridge the gap between technical functionality and creative design. You can envision innovative products and also understand the logical systems required to build them.",
+                path: [
+                    "Pursue a degree in Architecture, Industrial Design, or Human-Computer Interaction (HCI).",
+                    "Develop a portfolio that showcases both creative concepts and technical skills.",
+                    "Start as a Junior Designer, architectural assistant, or UI/UX designer.",
+                    "Progress to a Senior Product Designer, Project Architect, or Design Lead."
+                ]
+            }
+        };
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+
+        function initializeQuiz() {
+            currentQuestion = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('result-container').style.display = 'none';
+            showQuestion();
+            updateProgress();
+        }
+
+        function showQuestion() {
+            const questionData = questions[currentQuestion];
+            document.getElementById('question-text').textContent = questionData.question;
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            questionData.options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option.text;
+                optionElement.onclick = () => selectOption(option.value);
+                
+                if (userAnswers[currentQuestion] === option.value) {
+                    optionElement.style.borderColor = '#4f46e5';
+                    optionElement.style.backgroundColor = '#2c3241';
+                    optionElement.style.color = '#e5e7eb';
+                }
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            document.getElementById('prev-btn').disabled = currentQuestion === 0;
+            document.getElementById('next-btn').textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+        }
+
+        function selectOption(value) {
+            userAnswers[currentQuestion] = value;
+            showQuestion();
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentQuestion] === null) {
+                const customMessageDiv = document.createElement('div');
+                customMessageDiv.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50';
+                customMessageDiv.innerHTML = `
+                    <div class="bg-gray-800 text-gray-100 p-6 rounded-lg shadow-xl text-center border border-gray-700">
+                        <p class="mb-4">Please select an answer to continue.</p>
+                        <button onclick="this.parentNode.parentNode.remove()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">OK</button>
+                    </div>
+                `;
+                document.body.appendChild(customMessageDiv);
+                return;
+            }
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+                updateProgress();
+            } else {
+                calculateResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress-bar-inner').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+        }
+        
+        function calculateResult() {
+            const userScore = { analytical: 0, creative: 0, helping: 0, leadership: 0 };
+            
+            userAnswers.forEach(answer => {
+                if (answer) userScore[answer]++;
+            });
+
+            const sortedScores = Object.entries(userScore).sort(([,a],[,b]) => b-a);
+            
+            const primaryTrait = sortedScores[0][0];
+            const secondaryTrait = sortedScores[1][0];
+
+            let resultType = primaryTrait;
+            
+            // Check for combined profile if the secondary score is reasonably high
+            if (sortedScores[1][1] > 1) {
+                 const combinedKey1 = `${primaryTrait}_${secondaryTrait}`;
+                 const combinedKey2 = `${secondaryTrait}_${primaryTrait}`;
+                 if (careerPaths[combinedKey1]) {
+                     resultType = combinedKey1;
+                 } else if (careerPaths[combinedKey2]) {
+                     resultType = combinedKey2;
+                 }
+            }
+            
+            showResult(resultType);
+        }
+
+        function showResult(type) {
+            const career = careerPaths[type] || careerPaths['analytical']; // Fallback
+            document.getElementById('career-title').textContent = career.title;
+            document.getElementById('career-description').textContent = career.description;
+            
+            const pathDetails = document.getElementById('path-details');
+            let pathHtml = '<ul class="space-y-3 list-disc list-inside text-gray-400">';
+            career.path.forEach(step => {
+                pathHtml += `<li>${step}</li>`;
+            });
+            pathHtml += '</ul>';
+            pathDetails.innerHTML = pathHtml;
+            
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('result-container').style.display = 'block';
+        }
+
+        function restartTest() {
+            initializeQuiz();
+        }
+
+    </script>
+</body>
+</html>
